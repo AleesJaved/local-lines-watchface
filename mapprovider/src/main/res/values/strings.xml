@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Local Lines Maps</string>
     <string name="map_complication_label">Local Lines live map</string>
+    <string name="light_map_complication_label">Local Lines light map</string>
     <string name="map_content_description">Map of nearby streets</string>
     <string name="settings_title">Local Lines</string>
     <string name="permission_needed">Location permission is needed to draw nearby streets.</string>

@@ -34,6 +34,7 @@ import kotlin.coroutines.resumeWithException
 class MapSnapshotRepository private constructor(private val context: Context) {
     private val settings = MapSettings(context)
     private val liveMap = File(context.filesDir, "local_lines_map.jpg")
+    private val lightMap = File(context.filesDir, "local_lines_map_light.jpg")
     private val fallbackMap = File(context.filesDir, "local_lines_fallback.jpg")
 
     enum class RefreshResult { UPDATED, CACHED, NO_PERMISSION, NO_LOCATION, FAILED }
@@ -64,11 +65,14 @@ class MapSnapshotRepository private constructor(private val context: Context) {
         return fallbackMap
     }
 
-    fun currentMapFile(): File = if (liveMap.exists()) liveMap else ensureFallback()
+    fun currentMapFile(palette: MapPalette = MapPalette.DARK): File = when (palette) {
+        MapPalette.DARK -> if (liveMap.exists()) liveMap else ensureFallback()
+        MapPalette.LIGHT -> if (lightMap.exists()) lightMap else if (liveMap.exists()) liveMap else ensureFallback()
+    }
 
-    fun loadCurrentBitmap(): Bitmap {
+    fun loadCurrentBitmap(palette: MapPalette = MapPalette.DARK): Bitmap {
         val options = BitmapFactory.Options().apply { inPreferredConfig = Bitmap.Config.RGB_565 }
-        return BitmapFactory.decodeFile(currentMapFile().absolutePath, options)
+        return BitmapFactory.decodeFile(currentMapFile(palette).absolutePath, options)
             ?: Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
     }
 
@@ -76,26 +80,32 @@ class MapSnapshotRepository private constructor(private val context: Context) {
         if (!hasLocationPermission()) return RefreshResult.NO_PERMISSION
         val location = getCurrentLocation() ?: return RefreshResult.NO_LOCATION
         val distance = distanceFromPrevious(location)
-        if (!RefreshPolicy.shouldRender(force, liveMap.exists(), distance, settings.refreshMode)) {
+        if (!RefreshPolicy.shouldRender(force, liveMap.exists() && lightMap.exists(), distance, settings.refreshMode)) {
             return RefreshResult.CACHED
         }
 
-        return runCatching {
-            val bitmap = render(location)
-            val temporary = File(context.filesDir, "local_lines_map.tmp")
-            writeBitmap(bitmap, temporary)
-            bitmap.recycle()
-            if (!temporary.renameTo(liveMap)) {
-                temporary.copyTo(liveMap, overwrite = true)
-                temporary.delete()
-            }
+        return renderAndStore(location)
+    }
+
+    internal suspend fun refreshAt(latitude: Double, longitude: Double): RefreshResult {
+        val location = Location("saved-test-coordinate").apply {
+            this.latitude = latitude
+            this.longitude = longitude
+        }
+        return renderAndStore(location)
+    }
+
+    private suspend fun renderAndStore(location: Location): RefreshResult = runCatching {
+            val darkBitmap = render(location, MapPalette.DARK)
+            val lightBitmap = render(location, MapPalette.LIGHT)
+            replaceBitmap(darkBitmap, liveMap)
+            replaceBitmap(lightBitmap, lightMap)
             settings.recordSnapshot(location.latitude, location.longitude, System.currentTimeMillis())
             RefreshResult.UPDATED
         }.getOrElse { error ->
             Log.e(TAG, "Unable to render live map", error)
             RefreshResult.FAILED
         }
-    }
 
     private fun distanceFromPrevious(location: Location): Float {
         val previousLatitude = settings.lastLatitude ?: return Float.POSITIVE_INFINITY
@@ -151,15 +161,15 @@ class MapSnapshotRepository private constructor(private val context: Context) {
     private fun locationAgeMillis(location: Location): Long =
         ((SystemClock.elapsedRealtimeNanos() - location.elapsedRealtimeNanos).coerceAtLeast(0L) / 1_000_000L)
 
-    private suspend fun render(location: Location): Bitmap {
-        val first = renderOnce(location)
+    private suspend fun render(location: Location, palette: MapPalette): Bitmap {
+        val first = renderOnce(location, palette)
         val firstDensity = lineDensity(first)
         if (firstDensity >= MIN_LINE_DENSITY) return first
 
         // A snapshot can occasionally complete before every vector tile arrives on watch Wi-Fi.
         // Give the tile cache a moment, retry once, and retain whichever render is more complete.
         delay(TILE_RETRY_DELAY_MS)
-        val second = runCatching { renderOnce(location) }.getOrElse { return first }
+        val second = runCatching { renderOnce(location, palette) }.getOrElse { return first }
         return if (lineDensity(second) > firstDensity) {
             first.recycle()
             second
@@ -169,8 +179,12 @@ class MapSnapshotRepository private constructor(private val context: Context) {
         }
     }
 
-    private suspend fun renderOnce(location: Location): Bitmap = withContext(Dispatchers.Main) {
-        val styleJson = context.resources.openRawResource(R.raw.local_lines_style).bufferedReader().use { it.readText() }
+    private suspend fun renderOnce(location: Location, palette: MapPalette): Bitmap = withContext(Dispatchers.Main) {
+        val styleResource = when (palette) {
+            MapPalette.DARK -> R.raw.local_lines_style
+            MapPalette.LIGHT -> R.raw.local_lines_style_light
+        }
+        val styleJson = context.resources.openRawResource(styleResource).bufferedReader().use { it.readText() }
         suspendCancellableCoroutine { continuation ->
             val options = MapSnapshotter.Options(SIZE, SIZE)
                 .withPixelRatio(1f)
@@ -190,7 +204,7 @@ class MapSnapshotRepository private constructor(private val context: Context) {
             snapshotter.start(
                 { snapshot ->
                     val bitmap = snapshot.bitmap.copy(Bitmap.Config.RGB_565, true)
-                    drawAttribution(bitmap)
+                    drawAttribution(bitmap, palette)
                     if (continuation.isActive) continuation.resume(bitmap)
                 },
                 { error -> if (continuation.isActive) continuation.resumeWithException(IllegalStateException(error)) },
@@ -211,10 +225,10 @@ class MapSnapshotRepository private constructor(private val context: Context) {
         return brightSamples.toFloat() / samples
     }
 
-    private fun drawAttribution(bitmap: Bitmap) {
+    private fun drawAttribution(bitmap: Bitmap, palette: MapPalette) {
         val canvas = Canvas(bitmap)
         val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = Color.WHITE
+            color = if (palette == MapPalette.DARK) Color.WHITE else Color.rgb(55, 55, 52)
             alpha = 210
             textSize = 11f
             textAlign = Paint.Align.CENTER
@@ -225,6 +239,19 @@ class MapSnapshotRepository private constructor(private val context: Context) {
     private fun writeBitmap(bitmap: Bitmap, target: File) {
         FileOutputStream(target).use { output ->
             check(bitmap.compress(Bitmap.CompressFormat.JPEG, 92, output))
+        }
+    }
+
+    private fun replaceBitmap(bitmap: Bitmap, target: File) {
+        val temporary = File(context.filesDir, "${target.name}.tmp")
+        try {
+            writeBitmap(bitmap, temporary)
+            if (!temporary.renameTo(target)) {
+                temporary.copyTo(target, overwrite = true)
+                temporary.delete()
+            }
+        } finally {
+            bitmap.recycle()
         }
     }
 

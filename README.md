@@ -15,8 +15,10 @@ last successful live map and includes a decorative fallback.
 
 ## Features
 
-- Live, north-up map of nearby roads with no labels or location marker.
-- Eight coordinated colour themes.
+- Live, north-up map of nearby roads with no labels.
+- Eight single-colour themes plus dark and light multicolour map themes.
+- Multicolour maps show blue water, green spaces, hierarchical roads, and a red location marker.
+- Residential streets remain visible while driveways, parking aisles, paths, and tracks are omitted.
 - Large stacked digital hour and minute, respecting 12/24-hour settings.
 - Editable weather and step-count complications.
 - Battery Saver, Balanced, and Frequent map refresh modes.
@@ -53,7 +55,7 @@ weather provider; select the weather provider installed on the watch.
 
 ## Map data and privacy
 
-The provider makes one balanced-power location request only when scheduled or
+The provider makes one high-accuracy location request only when scheduled or
 manually refreshed. It stores only the last coordinate and rendered bitmap.
 The coordinate is used locally to request standard vector tiles from
 OpenFreeMap; no location history or user identity is collected.

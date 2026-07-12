@@ -1,6 +1,6 @@
 {
   "version": 8,
-  "name": "Local Lines Dark Multicolour",
+  "name": "Local Lines Light Multicolour",
   "sources": {
     "openmaptiles": {
       "type": "vector",
@@ -9,47 +9,47 @@
     }
   },
   "layers": [
-    { "id": "background", "type": "background", "paint": { "background-color": "#000000" } },
+    { "id": "background", "type": "background", "paint": { "background-color": "#F5F0E5" } },
     {
       "id": "green-landcover", "type": "fill", "source": "openmaptiles", "source-layer": "landcover",
       "filter": ["in", ["get", "class"], ["literal", ["grass", "wood"]]],
-      "paint": { "fill-color": "#174A2B", "fill-opacity": 0.92 }
+      "paint": { "fill-color": "#B9DCAD", "fill-opacity": 0.96 }
     },
     {
       "id": "green-parks", "type": "fill", "source": "openmaptiles", "source-layer": "park",
-      "paint": { "fill-color": "#1D5B34", "fill-opacity": 0.94 }
+      "paint": { "fill-color": "#A9D49B", "fill-opacity": 0.98 }
     },
     {
       "id": "green-recreation", "type": "fill", "source": "openmaptiles", "source-layer": "landuse",
       "filter": ["in", ["get", "class"], ["literal", ["pitch", "playground", "stadium", "golf_course"]]],
-      "paint": { "fill-color": "#21663B", "fill-opacity": 0.84 }
+      "paint": { "fill-color": "#9ECB8F", "fill-opacity": 0.9 }
     },
     {
       "id": "water", "type": "fill", "source": "openmaptiles", "source-layer": "water",
-      "paint": { "fill-color": "#176FC1", "fill-opacity": 0.96 }
+      "paint": { "fill-color": "#79BCE8", "fill-opacity": 0.98 }
     },
     {
       "id": "waterways", "type": "line", "source": "openmaptiles", "source-layer": "waterway",
       "layout": { "line-cap": "round", "line-join": "round" },
-      "paint": { "line-color": "#2D9CFF", "line-opacity": 0.96, "line-width": ["interpolate", ["linear"], ["zoom"], 12, 1.0, 16, 2.6, 18, 4.0] }
+      "paint": { "line-color": "#2386CE", "line-opacity": 0.96, "line-width": ["interpolate", ["linear"], ["zoom"], 12, 1.0, 16, 2.6, 18, 4.0] }
     },
     {
       "id": "roads-local", "type": "line", "source": "openmaptiles", "source-layer": "transportation",
       "filter": ["==", ["get", "class"], "minor"],
       "layout": { "line-cap": "round", "line-join": "round" },
-      "paint": { "line-color": "#FFFFFF", "line-opacity": 0.78, "line-width": ["interpolate", ["linear"], ["zoom"], 12, 0.7, 15, 1.5, 18, 2.8] }
+      "paint": { "line-color": "#696966", "line-opacity": 0.72, "line-width": ["interpolate", ["linear"], ["zoom"], 12, 0.7, 15, 1.5, 18, 2.8] }
     },
     {
       "id": "roads-tertiary", "type": "line", "source": "openmaptiles", "source-layer": "transportation",
       "filter": ["==", ["get", "class"], "tertiary"],
       "layout": { "line-cap": "round", "line-join": "round" },
-      "paint": { "line-color": "#FFFFFF", "line-opacity": 0.9, "line-width": ["interpolate", ["linear"], ["zoom"], 10, 1.0, 15, 2.8, 18, 4.8] }
+      "paint": { "line-color": "#4D4D4A", "line-opacity": 0.88, "line-width": ["interpolate", ["linear"], ["zoom"], 10, 1.0, 15, 2.8, 18, 4.8] }
     },
     {
       "id": "roads-major", "type": "line", "source": "openmaptiles", "source-layer": "transportation",
       "filter": ["in", ["get", "class"], ["literal", ["motorway", "trunk", "primary", "secondary"]]],
       "layout": { "line-cap": "round", "line-join": "round" },
-      "paint": { "line-color": "#FFFFFF", "line-opacity": 1.0, "line-width": ["interpolate", ["linear"], ["zoom"], 8, 1.5, 14, 3.8, 18, 6.4] }
+      "paint": { "line-color": "#292927", "line-opacity": 0.96, "line-width": ["interpolate", ["linear"], ["zoom"], 8, 1.5, 14, 3.8, 18, 6.4] }
     }
   ]
 }

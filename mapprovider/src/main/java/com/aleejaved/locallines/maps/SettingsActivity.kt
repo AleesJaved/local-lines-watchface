@@ -137,6 +137,10 @@ class SettingsActivity : Activity() {
                     this@SettingsActivity,
                     ComponentName(this@SettingsActivity, MapComplicationService::class.java),
                 ).requestUpdateAll()
+                ComplicationDataSourceUpdateRequester.create(
+                    this@SettingsActivity,
+                    ComponentName(this@SettingsActivity, LightMapComplicationService::class.java),
+                ).requestUpdateAll()
             }
             updatePreview()
         }

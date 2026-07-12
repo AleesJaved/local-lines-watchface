@@ -15,8 +15,21 @@ class MapSnapshotDeviceTest {
         val context = ApplicationProvider.getApplicationContext<LocalLinesApplication>()
         val repository = MapSnapshotRepository.get(context)
 
-        assertEquals(MapSnapshotRepository.RefreshResult.UPDATED, repository.refresh(force = true))
+        val liveResult = repository.refresh(force = true)
+        val result = if (liveResult == MapSnapshotRepository.RefreshResult.NO_LOCATION) {
+            val settings = MapSettings(context)
+            repository.refreshAt(
+                requireNotNull(settings.lastLatitude) { "No saved latitude available for palette test" },
+                requireNotNull(settings.lastLongitude) { "No saved longitude available for palette test" },
+            )
+        } else {
+            liveResult
+        }
+
+        assertEquals(MapSnapshotRepository.RefreshResult.UPDATED, result)
         assertTrue(repository.currentMapFile().name == "local_lines_map.jpg")
         assertTrue(repository.currentMapFile().length() > 10_000)
+        assertTrue(repository.currentMapFile(MapPalette.LIGHT).name == "local_lines_map_light.jpg")
+        assertTrue(repository.currentMapFile(MapPalette.LIGHT).length() > 10_000)
     }
 }

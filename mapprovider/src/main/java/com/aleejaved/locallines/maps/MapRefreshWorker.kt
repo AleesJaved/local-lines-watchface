@@ -17,6 +17,10 @@ class MapRefreshWorker(
                     applicationContext,
                     ComponentName(applicationContext, MapComplicationService::class.java),
                 ).requestUpdateAll()
+                ComplicationDataSourceUpdateRequester.create(
+                    applicationContext,
+                    ComponentName(applicationContext, LightMapComplicationService::class.java),
+                ).requestUpdateAll()
                 Result.success()
             }
             MapSnapshotRepository.RefreshResult.FAILED -> Result.retry()
