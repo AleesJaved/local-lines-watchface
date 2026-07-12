@@ -8,15 +8,23 @@
     <string name="enable_background_location">Allow background updates</string>
     <string name="manual_refresh">Refresh map now</string>
     <string name="refresh_mode">Refresh mode</string>
+    <string name="live">Live · passive movement / 250m</string>
     <string name="battery_saver">Battery Saver · 6h / 2km</string>
     <string name="balanced">Balanced · 2h / 1km</string>
     <string name="frequent">Frequent · 30m / 500m</string>
+    <string name="location_label_mode">Top location label</string>
+    <string name="location_none">Hidden</string>
+    <string name="location_street">Street</string>
+    <string name="location_town">Town</string>
+    <string name="location_city">City</string>
+    <string name="location_preview">Current location</string>
+    <string name="location_complication_label">Local Lines location</string>
     <string name="refreshing">Refreshing map…</string>
     <string name="refresh_success">Map updated</string>
     <string name="refresh_cached">Using cached map</string>
     <string name="refresh_failed">Could not update; the cached map remains available.</string>
     <string name="never_updated">No live map downloaded yet</string>
     <string name="last_updated">Last updated: %1$s</string>
-    <string name="privacy_text">Your location stays on this watch. Only standard vector-tile coordinates are requested from OpenFreeMap.</string>
+    <string name="privacy_text">The last location, labels, and map are stored only on this watch. Map coordinates are sent to OpenFreeMap. When Android cannot provide a place name, one coordinate is sent to OpenStreetMap Nominatim and the result is cached.</string>
     <string name="attribution">© OpenStreetMap · © OpenMapTiles · OpenFreeMap · MapLibre</string>
 </resources>

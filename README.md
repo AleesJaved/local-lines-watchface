@@ -21,7 +21,11 @@ last successful live map and includes a decorative fallback.
 - Residential streets remain visible while driveways, parking aisles, paths, and tracks are omitted.
 - Large stacked digital hour and minute, respecting 12/24-hour settings.
 - Editable weather and step-count complications.
+- Optional curved top location label with street, town, or city detail.
+- Curved bottom text complication for calendars and other long-text sources.
 - Battery Saver, Balanced, and Frequent map refresh modes.
+- Battery-efficient Live mode uses passive movement fixes, a 250 m movement gate,
+  five-minute batching, low-battery/network constraints, and a two-hour fallback.
 - Black, time-only ambient display.
 - No accounts, analytics, advertisements, API keys, or paid map service.
 
@@ -55,12 +59,20 @@ weather provider; select the weather provider installed on the watch.
 
 ## Map data and privacy
 
-The provider makes one high-accuracy location request only when scheduled or
-manually refreshed. It stores only the last coordinate and rendered bitmap.
+The provider uses balanced-power location for scheduled work and requests high
+accuracy only for a manual refresh. It stores only the last coordinate,
+resolved labels, and rendered bitmap.
 The coordinate is used locally to request standard vector tiles from
 OpenFreeMap; no location history or user identity is collected.
 
-Map rendering uses [MapLibre Native](https://maplibre.org/) and
+Location names first use Android's system geocoder when a map refresh is
+already required. If it returns no result, the provider makes one reverse
+lookup through the public OpenStreetMap Nominatim service. Results are cached
+on the watch, and Live mode's movement gate and batching prevent repeated
+lookups. This use must remain within the
+[Nominatim usage policy](https://operations.osmfoundation.org/policies/nominatim/).
+Map rendering uses
+[MapLibre Native](https://maplibre.org/) and
 [OpenFreeMap](https://openfreemap.org/). Map data is © OpenStreetMap
 contributors and © OpenMapTiles. Attribution is embedded in every live map.
 

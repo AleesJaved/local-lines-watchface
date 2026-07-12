@@ -2,7 +2,6 @@ package com.aleejaved.locallines.maps
 
 import android.Manifest
 import android.app.Activity
-import android.content.ComponentName
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
@@ -17,7 +16,6 @@ import android.widget.RadioGroup
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -88,6 +86,7 @@ class SettingsActivity : Activity() {
                 id = ViewGroup.generateViewId()
                 tag = mode
                 text = when (mode) {
+                    RefreshMode.LIVE -> getString(R.string.live)
                     RefreshMode.BATTERY_SAVER -> getString(R.string.battery_saver)
                     RefreshMode.BALANCED -> getString(R.string.balanced)
                     RefreshMode.FREQUENT -> getString(R.string.frequent)
@@ -102,6 +101,33 @@ class SettingsActivity : Activity() {
             RefreshScheduler.schedule(this, mode)
         }
         content.addView(radioGroup, matchWidth())
+
+        content.addView(label(getString(R.string.location_label_mode), 17f, Color.WHITE), matchWidth())
+        val locationGroup = RadioGroup(this).apply { orientation = RadioGroup.VERTICAL }
+        LocationLabelMode.entries.forEach { mode ->
+            locationGroup.addView(RadioButton(this).apply {
+                id = ViewGroup.generateViewId()
+                tag = mode
+                text = when (mode) {
+                    LocationLabelMode.NONE -> getString(R.string.location_none)
+                    LocationLabelMode.STREET -> getString(R.string.location_street)
+                    LocationLabelMode.TOWN -> getString(R.string.location_town)
+                    LocationLabelMode.CITY -> getString(R.string.location_city)
+                }
+                setTextColor(Color.WHITE)
+                isChecked = mode == settings.locationLabelMode
+            })
+        }
+        locationGroup.setOnCheckedChangeListener { group, checkedId ->
+            val mode = group.findViewById<RadioButton>(checkedId)?.tag as? LocationLabelMode
+                ?: return@setOnCheckedChangeListener
+            settings.locationLabelMode = mode
+            ComplicationUpdates.requestAll(this)
+            if (mode != LocationLabelMode.NONE && settings.selectedLocationLabel() == null) {
+                refreshNow()
+            }
+        }
+        content.addView(locationGroup, matchWidth())
 
         content.addView(actionButton(getString(R.string.enable_location)) {
             requestPermissions(
@@ -133,10 +159,7 @@ class SettingsActivity : Activity() {
                 else -> getString(R.string.refresh_failed)
             }
             if (result == MapSnapshotRepository.RefreshResult.UPDATED) {
-                ComplicationDataSourceUpdateRequester.create(
-                    this@SettingsActivity,
-                    ComponentName(this@SettingsActivity, MapComplicationService::class.java),
-                ).requestUpdateAll()
+                ComplicationUpdates.requestAll(this@SettingsActivity)
             }
             updatePreview()
         }
@@ -161,6 +184,7 @@ class SettingsActivity : Activity() {
             )
         }
         updatePreview()
+        if (settings.refreshMode == RefreshMode.LIVE) PassiveLocationManager.register(this)
     }
 
     private fun updatePreview() {

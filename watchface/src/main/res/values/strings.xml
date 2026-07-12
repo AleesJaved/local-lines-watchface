@@ -16,4 +16,6 @@
     <string name="background_complication">Local map</string>
     <string name="weather_complication">Weather</string>
     <string name="steps_complication">Steps</string>
+    <string name="bottom_text_complication">Bottom calendar text</string>
+    <string name="location_complication">Current location</string>
 </resources>

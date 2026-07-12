@@ -14,9 +14,9 @@
             <ColorOption id="pink" displayName="theme_neon_pink" colors="#FFFF58C7 #FFFFE2F6 #FFFFB8E6" />
         </ColorConfiguration>
         <ListConfiguration id="mapStyle" defaultValue="tinted" displayName="map_style_label" screenReaderText="map_style_label">
-            <ListOption id="tinted" displayName="map_style_tinted" screenReaderText="map_style_tinted" />
-            <ListOption id="multicolor" displayName="map_style_multicolor" screenReaderText="map_style_multicolor" />
-            <ListOption id="light_multicolor" displayName="map_style_light_multicolor" screenReaderText="map_style_light_multicolor" />
+            <ListOption id="tinted" displayName="map_style_tinted" screenReaderText="map_style_tinted" icon="map_style_tinted_preview" />
+            <ListOption id="multicolor" displayName="map_style_multicolor" screenReaderText="map_style_multicolor" icon="map_style_dark_preview" />
+            <ListOption id="light_multicolor" displayName="map_style_light_multicolor" screenReaderText="map_style_light_multicolor" icon="map_style_light_preview" />
         </ListConfiguration>
     </UserConfigurations>
 
@@ -62,48 +62,105 @@
             </Complication>
         </ComplicationSlot>
 
-        <ComplicationSlot x="54" y="177" width="104" height="104" slotId="1" name="weather" displayName="weather_complication" supportedTypes="SHORT_TEXT SMALL_IMAGE MONOCHROMATIC_IMAGE RANGED_VALUE EMPTY">
+        <!-- Complication frames are shared so empty slots retain the balanced layout. -->
+        <Condition>
+            <Expressions>
+                <Expression name="frames_dark"><![CDATA[[CONFIGURATION.mapStyle] == "multicolor"]]></Expression>
+                <Expression name="frames_light"><![CDATA[[CONFIGURATION.mapStyle] == "light_multicolor"]]></Expression>
+            </Expressions>
+            <Compare expression="frames_dark">
+                <PartDraw x="0" y="0" width="450" height="450">
+                    <Ellipse x="39" y="177" width="98" height="98"><Fill color="#D9000000" /><Stroke color="#FF2D9CFF" thickness="2" /></Ellipse>
+                    <Ellipse x="313" y="177" width="98" height="98"><Fill color="#D9000000" /><Stroke color="#FF2D9CFF" thickness="2" /></Ellipse>
+                </PartDraw>
+            </Compare>
+            <Compare expression="frames_light">
+                <PartDraw x="0" y="0" width="450" height="450">
+                    <Ellipse x="39" y="177" width="98" height="98"><Fill color="#E8315F9B" /><Stroke color="#FF202124" thickness="2" /></Ellipse>
+                    <Ellipse x="313" y="177" width="98" height="98"><Fill color="#E8315F9B" /><Stroke color="#FF202124" thickness="2" /></Ellipse>
+                </PartDraw>
+            </Compare>
+            <Default>
+                <PartDraw x="0" y="0" width="450" height="450">
+                    <Ellipse x="39" y="177" width="98" height="98"><Fill color="#D9000000" /><Stroke color="[CONFIGURATION.themeColor.0]" thickness="2" /></Ellipse>
+                    <Ellipse x="313" y="177" width="98" height="98"><Fill color="#D9000000" /><Stroke color="[CONFIGURATION.themeColor.0]" thickness="2" /></Ellipse>
+                </PartDraw>
+            </Default>
+        </Condition>
+
+        <ComplicationSlot x="36" y="174" width="104" height="104" slotId="1" name="weather" displayName="weather_complication" supportedTypes="SHORT_TEXT SMALL_IMAGE MONOCHROMATIC_IMAGE RANGED_VALUE EMPTY">
             <Variant mode="AMBIENT" target="alpha" value="0" />
             <DefaultProviderPolicy defaultSystemProvider="EMPTY" defaultSystemProviderType="EMPTY" />
             <BoundingOval x="0" y="0" width="104" height="104" outlinePadding="2" />
             <Complication type="SHORT_TEXT">
-                <PartDraw x="0" y="0" width="104" height="104"><Ellipse x="3" y="3" width="98" height="98"><Fill color="#D9000000" /><Stroke color="[CONFIGURATION.themeColor.0]" thickness="2" /></Ellipse></PartDraw>
-                <PartText x="12" y="29" width="80" height="47" tintColor="[CONFIGURATION.themeColor.2]"><Text align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="24" weight="BOLD"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></Text></PartText>
+                <Condition><Expressions><Expression name="weather_text_color"><![CDATA[[CONFIGURATION.mapStyle] != "tinted"]]></Expression></Expressions><Compare expression="weather_text_color"><PartText x="12" y="29" width="80" height="47" tintColor="#FFFFFFFF"><Text align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="24" weight="BOLD"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></Text></PartText></Compare><Default><PartText x="12" y="29" width="80" height="47" tintColor="[CONFIGURATION.themeColor.2]"><Text align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="24" weight="BOLD"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></Text></PartText></Default></Condition>
             </Complication>
             <Complication type="MONOCHROMATIC_IMAGE">
-                <PartDraw x="0" y="0" width="104" height="104"><Ellipse x="3" y="3" width="98" height="98"><Fill color="#D9000000" /><Stroke color="[CONFIGURATION.themeColor.0]" thickness="2" /></Ellipse></PartDraw>
-                <PartImage x="28" y="28" width="48" height="48" tintColor="[CONFIGURATION.themeColor.2]"><Image resource="[COMPLICATION.MONOCHROMATIC_IMAGE]" /></PartImage>
+                <Condition><Expressions><Expression name="weather_icon_color"><![CDATA[[CONFIGURATION.mapStyle] != "tinted"]]></Expression></Expressions><Compare expression="weather_icon_color"><PartImage x="28" y="28" width="48" height="48" tintColor="#FFFFFFFF"><Image resource="[COMPLICATION.MONOCHROMATIC_IMAGE]" /></PartImage></Compare><Default><PartImage x="28" y="28" width="48" height="48" tintColor="[CONFIGURATION.themeColor.2]"><Image resource="[COMPLICATION.MONOCHROMATIC_IMAGE]" /></PartImage></Default></Condition>
             </Complication>
             <Complication type="SMALL_IMAGE">
-                <PartDraw x="0" y="0" width="104" height="104"><Ellipse x="3" y="3" width="98" height="98"><Fill color="#D9000000" /><Stroke color="[CONFIGURATION.themeColor.0]" thickness="2" /></Ellipse></PartDraw>
                 <PartImage x="24" y="24" width="56" height="56"><Image resource="[COMPLICATION.SMALL_IMAGE]" /></PartImage>
             </Complication>
             <Complication type="RANGED_VALUE">
-                <PartDraw x="0" y="0" width="104" height="104"><Ellipse x="3" y="3" width="98" height="98"><Fill color="#D9000000" /><Stroke color="[CONFIGURATION.themeColor.0]" thickness="2" /></Ellipse></PartDraw>
-                <PartText x="12" y="29" width="80" height="47" tintColor="[CONFIGURATION.themeColor.2]"><Text align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="22" weight="BOLD"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></Text></PartText>
+                <Condition><Expressions><Expression name="weather_range_color"><![CDATA[[CONFIGURATION.mapStyle] != "tinted"]]></Expression></Expressions><Compare expression="weather_range_color"><PartText x="12" y="29" width="80" height="47" tintColor="#FFFFFFFF"><Text align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="22" weight="BOLD"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></Text></PartText></Compare><Default><PartText x="12" y="29" width="80" height="47" tintColor="[CONFIGURATION.themeColor.2]"><Text align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="22" weight="BOLD"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></Text></PartText></Default></Condition>
             </Complication>
         </ComplicationSlot>
 
-        <ComplicationSlot x="292" y="177" width="104" height="104" slotId="2" name="steps" displayName="steps_complication" supportedTypes="SHORT_TEXT SMALL_IMAGE MONOCHROMATIC_IMAGE RANGED_VALUE EMPTY">
+        <ComplicationSlot x="310" y="174" width="104" height="104" slotId="2" name="steps" displayName="steps_complication" supportedTypes="SHORT_TEXT SMALL_IMAGE MONOCHROMATIC_IMAGE RANGED_VALUE EMPTY">
             <Variant mode="AMBIENT" target="alpha" value="0" />
             <DefaultProviderPolicy defaultSystemProvider="STEP_COUNT" defaultSystemProviderType="SHORT_TEXT" />
             <BoundingOval x="0" y="0" width="104" height="104" outlinePadding="2" />
             <Complication type="SHORT_TEXT">
-                <PartDraw x="0" y="0" width="104" height="104"><Ellipse x="3" y="3" width="98" height="98"><Fill color="#D9000000" /><Stroke color="[CONFIGURATION.themeColor.0]" thickness="2" /></Ellipse></PartDraw>
-                <PartText x="10" y="27" width="84" height="32" tintColor="[CONFIGURATION.themeColor.2]"><Text align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="23" weight="BOLD"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></Text></PartText>
-                <PartText x="10" y="59" width="84" height="25" tintColor="[CONFIGURATION.themeColor.0]"><Text align="CENTER"><Font family="SYNC_TO_DEVICE" size="15" weight="BOLD">STEPS</Font></Text></PartText>
+                <Condition><Expressions><Expression name="steps_text_color"><![CDATA[[CONFIGURATION.mapStyle] != "tinted"]]></Expression></Expressions><Compare expression="steps_text_color"><PartText x="10" y="27" width="84" height="32" tintColor="#FFFFFFFF"><Text align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="23" weight="BOLD"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></Text></PartText><PartText x="10" y="59" width="84" height="25" tintColor="#FF9CC7FF"><Text align="CENTER"><Font family="SYNC_TO_DEVICE" size="15" weight="BOLD">STEPS</Font></Text></PartText></Compare><Default><PartText x="10" y="27" width="84" height="32" tintColor="[CONFIGURATION.themeColor.2]"><Text align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="23" weight="BOLD"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></Text></PartText><PartText x="10" y="59" width="84" height="25" tintColor="[CONFIGURATION.themeColor.0]"><Text align="CENTER"><Font family="SYNC_TO_DEVICE" size="15" weight="BOLD">STEPS</Font></Text></PartText></Default></Condition>
             </Complication>
             <Complication type="MONOCHROMATIC_IMAGE">
-                <PartDraw x="0" y="0" width="104" height="104"><Ellipse x="3" y="3" width="98" height="98"><Fill color="#D9000000" /><Stroke color="[CONFIGURATION.themeColor.0]" thickness="2" /></Ellipse></PartDraw>
-                <PartImage x="28" y="28" width="48" height="48" tintColor="[CONFIGURATION.themeColor.2]"><Image resource="[COMPLICATION.MONOCHROMATIC_IMAGE]" /></PartImage>
+                <Condition><Expressions><Expression name="steps_icon_color"><![CDATA[[CONFIGURATION.mapStyle] != "tinted"]]></Expression></Expressions><Compare expression="steps_icon_color"><PartImage x="28" y="28" width="48" height="48" tintColor="#FFFFFFFF"><Image resource="[COMPLICATION.MONOCHROMATIC_IMAGE]" /></PartImage></Compare><Default><PartImage x="28" y="28" width="48" height="48" tintColor="[CONFIGURATION.themeColor.2]"><Image resource="[COMPLICATION.MONOCHROMATIC_IMAGE]" /></PartImage></Default></Condition>
             </Complication>
             <Complication type="SMALL_IMAGE">
-                <PartDraw x="0" y="0" width="104" height="104"><Ellipse x="3" y="3" width="98" height="98"><Fill color="#D9000000" /><Stroke color="[CONFIGURATION.themeColor.0]" thickness="2" /></Ellipse></PartDraw>
                 <PartImage x="24" y="24" width="56" height="56"><Image resource="[COMPLICATION.SMALL_IMAGE]" /></PartImage>
             </Complication>
             <Complication type="RANGED_VALUE">
-                <PartDraw x="0" y="0" width="104" height="104"><Ellipse x="3" y="3" width="98" height="98"><Fill color="#D9000000" /><Stroke color="[CONFIGURATION.themeColor.0]" thickness="2" /></Ellipse></PartDraw>
-                <PartText x="10" y="35" width="84" height="38" tintColor="[CONFIGURATION.themeColor.2]"><Text align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="21" weight="BOLD"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></Text></PartText>
+                <Condition><Expressions><Expression name="steps_range_color"><![CDATA[[CONFIGURATION.mapStyle] != "tinted"]]></Expression></Expressions><Compare expression="steps_range_color"><PartText x="10" y="35" width="84" height="38" tintColor="#FFFFFFFF"><Text align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="21" weight="BOLD"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></Text></PartText></Compare><Default><PartText x="10" y="35" width="84" height="38" tintColor="[CONFIGURATION.themeColor.2]"><Text align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="21" weight="BOLD"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></Text></PartText></Default></Condition>
+            </Complication>
+        </ComplicationSlot>
+
+        <ComplicationSlot x="0" y="0" width="450" height="450" slotId="3" name="bottom_text" displayName="bottom_text_complication" supportedTypes="LONG_TEXT SHORT_TEXT EMPTY">
+            <Variant mode="AMBIENT" target="alpha" value="0" />
+            <DefaultProviderPolicy defaultSystemProvider="EMPTY" defaultSystemProviderType="EMPTY" />
+            <BoundingArc centerX="225" centerY="225" width="420" height="420" thickness="42" startAngle="225" endAngle="135" direction="COUNTER_CLOCKWISE" isRoundEdge="TRUE" outlinePadding="3" />
+            <Complication type="LONG_TEXT">
+                <Condition>
+                    <Expressions><Expression name="bottom_long_light"><![CDATA[[CONFIGURATION.mapStyle] == "light_multicolor"]]></Expression></Expressions>
+                    <Compare expression="bottom_long_light"><PartText x="0" y="0" width="450" height="450"><TextCircular centerX="225" centerY="225" width="410" height="410" startAngle="225" endAngle="135" direction="COUNTER_CLOCKWISE" align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="18" weight="BOLD" color="#FF202124"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Compare>
+                    <Default><PartText x="0" y="0" width="450" height="450"><TextCircular centerX="225" centerY="225" width="410" height="410" startAngle="225" endAngle="135" direction="COUNTER_CLOCKWISE" align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="18" weight="BOLD" color="[CONFIGURATION.themeColor.2]"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Default>
+                </Condition>
+            </Complication>
+            <Complication type="SHORT_TEXT">
+                <Condition>
+                    <Expressions><Expression name="bottom_short_light"><![CDATA[[CONFIGURATION.mapStyle] == "light_multicolor"]]></Expression></Expressions>
+                    <Compare expression="bottom_short_light"><PartText x="0" y="0" width="450" height="450"><TextCircular centerX="225" centerY="225" width="410" height="410" startAngle="225" endAngle="135" direction="COUNTER_CLOCKWISE" align="CENTER"><Font family="SYNC_TO_DEVICE" size="18" weight="BOLD" color="#FF202124"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Compare>
+                    <Default><PartText x="0" y="0" width="450" height="450"><TextCircular centerX="225" centerY="225" width="410" height="410" startAngle="225" endAngle="135" direction="COUNTER_CLOCKWISE" align="CENTER"><Font family="SYNC_TO_DEVICE" size="18" weight="BOLD" color="[CONFIGURATION.themeColor.2]"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Default>
+                </Condition>
+            </Complication>
+        </ComplicationSlot>
+
+        <ComplicationSlot x="0" y="0" width="450" height="450" slotId="4" name="location" displayName="location_complication" supportedTypes="LONG_TEXT SHORT_TEXT EMPTY">
+            <Variant mode="AMBIENT" target="alpha" value="0" />
+            <DefaultProviderPolicy primaryProvider="com.aleejaved.locallines.maps/com.aleejaved.locallines.maps.LocationComplicationService" primaryProviderType="SHORT_TEXT" defaultSystemProvider="EMPTY" defaultSystemProviderType="EMPTY" />
+            <BoundingArc centerX="225" centerY="225" width="420" height="420" thickness="42" startAngle="315" endAngle="45" direction="CLOCKWISE" isRoundEdge="TRUE" outlinePadding="3" />
+            <Complication type="LONG_TEXT">
+                <Condition>
+                    <Expressions><Expression name="location_long_light"><![CDATA[[CONFIGURATION.mapStyle] == "light_multicolor"]]></Expression></Expressions>
+                    <Compare expression="location_long_light"><PartText x="0" y="0" width="450" height="450"><TextCircular centerX="225" centerY="225" width="410" height="410" startAngle="315" endAngle="45" direction="CLOCKWISE" align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="18" weight="BOLD" color="#FF202124"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Compare>
+                    <Default><PartText x="0" y="0" width="450" height="450"><TextCircular centerX="225" centerY="225" width="410" height="410" startAngle="315" endAngle="45" direction="CLOCKWISE" align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="18" weight="BOLD" color="[CONFIGURATION.themeColor.2]"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Default>
+                </Condition>
+            </Complication>
+            <Complication type="SHORT_TEXT">
+                <Condition>
+                    <Expressions><Expression name="location_short_light"><![CDATA[[CONFIGURATION.mapStyle] == "light_multicolor"]]></Expression></Expressions>
+                    <Compare expression="location_short_light"><PartText x="0" y="0" width="450" height="450"><TextCircular centerX="225" centerY="225" width="410" height="410" startAngle="315" endAngle="45" direction="CLOCKWISE" align="CENTER"><Font family="SYNC_TO_DEVICE" size="18" weight="BOLD" color="#FF202124"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Compare>
+                    <Default><PartText x="0" y="0" width="450" height="450"><TextCircular centerX="225" centerY="225" width="410" height="410" startAngle="315" endAngle="45" direction="CLOCKWISE" align="CENTER"><Font family="SYNC_TO_DEVICE" size="18" weight="BOLD" color="[CONFIGURATION.themeColor.2]"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Default>
+                </Condition>
             </Complication>
         </ComplicationSlot>
 

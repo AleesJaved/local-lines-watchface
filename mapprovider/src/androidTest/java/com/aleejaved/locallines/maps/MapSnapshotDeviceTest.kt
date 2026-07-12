@@ -14,10 +14,12 @@ class MapSnapshotDeviceTest {
     fun rendersLiveMapUsingWatchLocation() = runBlocking {
         val context = ApplicationProvider.getApplicationContext<LocalLinesApplication>()
         val repository = MapSnapshotRepository.get(context)
+        val settings = MapSettings(context).apply {
+            locationLabelMode = LocationLabelMode.STREET
+        }
 
         val liveResult = repository.refresh(force = true)
         val result = if (liveResult == MapSnapshotRepository.RefreshResult.NO_LOCATION) {
-            val settings = MapSettings(context)
             repository.refreshAt(
                 requireNotNull(settings.lastLatitude) { "No saved latitude available for palette test" },
                 requireNotNull(settings.lastLongitude) { "No saved longitude available for palette test" },
@@ -36,6 +38,7 @@ class MapSnapshotDeviceTest {
             assertEquals(MapSnapshotRepository.SIZE * 2, combined.height)
             combined.recycle()
         }
+        assertTrue("No street, town, or city label was resolved", settings.selectedLocationLabel().isNullOrBlank().not())
         Unit
     }
 }

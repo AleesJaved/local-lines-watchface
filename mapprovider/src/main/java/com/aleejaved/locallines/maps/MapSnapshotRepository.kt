@@ -33,6 +33,7 @@ import kotlin.coroutines.resumeWithException
 
 class MapSnapshotRepository private constructor(private val context: Context) {
     private val settings = MapSettings(context)
+    private val locationNameResolver = LocationNameResolver(context)
     private val liveMap = File(context.filesDir, "local_lines_map.jpg")
     private val lightMap = File(context.filesDir, "local_lines_map_light.jpg")
     private val combinedMap = File(context.filesDir, "local_lines_map_combined.jpg")
@@ -86,7 +87,21 @@ class MapSnapshotRepository private constructor(private val context: Context) {
 
     suspend fun refresh(force: Boolean): RefreshResult {
         if (!hasLocationPermission()) return RefreshResult.NO_PERMISSION
-        val location = getCurrentLocation() ?: return RefreshResult.NO_LOCATION
+        val location = getCurrentLocation(highAccuracy = force) ?: return RefreshResult.NO_LOCATION
+        return refreshForLocation(location, force)
+    }
+
+    suspend fun refreshFromPassive(latitude: Double, longitude: Double, locationTime: Long): RefreshResult {
+        if (System.currentTimeMillis() - locationTime > MAX_PASSIVE_LOCATION_AGE_MS) return RefreshResult.NO_LOCATION
+        val location = Location("passive").apply {
+            this.latitude = latitude
+            this.longitude = longitude
+            time = locationTime
+        }
+        return refreshForLocation(location, force = false)
+    }
+
+    private suspend fun refreshForLocation(location: Location, force: Boolean): RefreshResult {
         val distance = distanceFromPrevious(location)
         if (!RefreshPolicy.shouldRender(
                 force,
@@ -116,6 +131,11 @@ class MapSnapshotRepository private constructor(private val context: Context) {
             replaceBitmap(darkBitmap, liveMap)
             replaceBitmap(lightBitmap, lightMap)
             replaceBitmap(combinedBitmap, combinedMap)
+            if (settings.locationLabelMode != LocationLabelMode.NONE) {
+                locationNameResolver.resolve(location.latitude, location.longitude)?.let { names ->
+                    settings.recordAddress(names.street, names.town, names.city)
+                }
+            }
             settings.recordSnapshot(location.latitude, location.longitude, System.currentTimeMillis())
             RefreshResult.UPDATED
         }.getOrElse { error ->
@@ -141,7 +161,7 @@ class MapSnapshotRepository private constructor(private val context: Context) {
         ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
             ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
 
-    private suspend fun getCurrentLocation(): Location? {
+    private suspend fun getCurrentLocation(highAccuracy: Boolean): Location? {
         if (
             ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
             ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -150,7 +170,10 @@ class MapSnapshotRepository private constructor(private val context: Context) {
         val tokenSource = CancellationTokenSource()
         return runCatching {
             val request = CurrentLocationRequest.Builder()
-                .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
+                .setPriority(
+                    if (highAccuracy) Priority.PRIORITY_HIGH_ACCURACY
+                    else Priority.PRIORITY_BALANCED_POWER_ACCURACY,
+                )
                 .setMaxUpdateAgeMillis(MAX_CURRENT_LOCATION_AGE_MS)
                 .setDurationMillis(LOCATION_REQUEST_TIMEOUT_MS)
                 .build()
@@ -287,6 +310,7 @@ class MapSnapshotRepository private constructor(private val context: Context) {
         private const val MAX_CURRENT_LOCATION_AGE_MS = 60_000L
         private const val MAX_CACHED_LOCATION_AGE_MS = 15 * 60_000L
         private const val LOCATION_REQUEST_TIMEOUT_MS = 25_000L
+        private const val MAX_PASSIVE_LOCATION_AGE_MS = 15 * 60_000L
         @SuppressLint("StaticFieldLeak") // Repository always stores context.applicationContext.
         @Volatile private var instance: MapSnapshotRepository? = null
 
