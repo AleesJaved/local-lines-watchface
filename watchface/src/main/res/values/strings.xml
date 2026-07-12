@@ -1,0 +1,15 @@
+<resources>
+    <string name="watch_face_name">Local Lines</string>
+    <string name="theme_label">Colour theme</string>
+    <string name="theme_electric_blue">Electric Blue</string>
+    <string name="theme_cyan">Cyan</string>
+    <string name="theme_violet">Violet</string>
+    <string name="theme_emerald">Emerald</string>
+    <string name="theme_amber">Amber</string>
+    <string name="theme_crimson">Crimson</string>
+    <string name="theme_monochrome">Monochrome</string>
+    <string name="theme_neon_pink">Neon Pink</string>
+    <string name="background_complication">Local map</string>
+    <string name="weather_complication">Weather</string>
+    <string name="steps_complication">Steps</string>
+</resources>

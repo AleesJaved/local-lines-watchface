@@ -1,0 +1,3 @@
+-keep class org.maplibre.** { *; }
+-dontwarn org.maplibre.**
+-keep class com.aleejaved.locallines.maps.MapComplicationService { *; }
