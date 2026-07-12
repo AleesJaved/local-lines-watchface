@@ -11,9 +11,7 @@ import androidx.wear.watchface.complications.data.PlainComplicationText
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 
-open class MapComplicationService : SuspendingComplicationDataSourceService() {
-    protected open val palette: MapPalette = MapPalette.DARK
-
+class MapComplicationService : SuspendingComplicationDataSourceService() {
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
         if (request.complicationType != ComplicationType.PHOTO_IMAGE) return NoDataComplicationData()
         return buildData(includeTapAction = true)
@@ -23,7 +21,7 @@ open class MapComplicationService : SuspendingComplicationDataSourceService() {
         if (type == ComplicationType.PHOTO_IMAGE) buildData(includeTapAction = false) else null
 
     private fun buildData(includeTapAction: Boolean): ComplicationData {
-        val bitmap = MapSnapshotRepository.get(this).loadCurrentBitmap(palette)
+        val bitmap = MapSnapshotRepository.get(this).loadComplicationBitmap()
         val builder = PhotoImageComplicationData.Builder(
             photoImage = Icon.createWithBitmap(bitmap),
             contentDescription = PlainComplicationText.Builder(
@@ -43,8 +41,4 @@ open class MapComplicationService : SuspendingComplicationDataSourceService() {
         }
         return builder.build()
     }
-}
-
-class LightMapComplicationService : MapComplicationService() {
-    override val palette: MapPalette = MapPalette.LIGHT
 }

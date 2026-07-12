@@ -31,5 +31,11 @@ class MapSnapshotDeviceTest {
         assertTrue(repository.currentMapFile().length() > 10_000)
         assertTrue(repository.currentMapFile(MapPalette.LIGHT).name == "local_lines_map_light.jpg")
         assertTrue(repository.currentMapFile(MapPalette.LIGHT).length() > 10_000)
+        repository.loadComplicationBitmap().also { combined ->
+            assertEquals(MapSnapshotRepository.SIZE, combined.width)
+            assertEquals(MapSnapshotRepository.SIZE * 2, combined.height)
+            combined.recycle()
+        }
+        Unit
     }
 }

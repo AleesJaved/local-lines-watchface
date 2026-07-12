@@ -9,10 +9,11 @@
     <string name="theme_crimson">Crimson</string>
     <string name="theme_monochrome">Monochrome</string>
     <string name="theme_neon_pink">Neon Pink</string>
-    <string name="theme_multicolor">Multicolour</string>
-    <string name="theme_light_multicolor">Light Multicolour</string>
+    <string name="map_style_label">Map style</string>
+    <string name="map_style_tinted">Theme colour</string>
+    <string name="map_style_multicolor">Multicolour</string>
+    <string name="map_style_light_multicolor">Light Multicolour</string>
     <string name="background_complication">Local map</string>
-    <string name="light_background_complication">Light local map</string>
     <string name="weather_complication">Weather</string>
     <string name="steps_complication">Steps</string>
 </resources>

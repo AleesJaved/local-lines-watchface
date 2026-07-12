@@ -35,6 +35,7 @@ class MapSnapshotRepository private constructor(private val context: Context) {
     private val settings = MapSettings(context)
     private val liveMap = File(context.filesDir, "local_lines_map.jpg")
     private val lightMap = File(context.filesDir, "local_lines_map_light.jpg")
+    private val combinedMap = File(context.filesDir, "local_lines_map_combined.jpg")
     private val fallbackMap = File(context.filesDir, "local_lines_fallback.jpg")
 
     enum class RefreshResult { UPDATED, CACHED, NO_PERMISSION, NO_LOCATION, FAILED }
@@ -76,11 +77,24 @@ class MapSnapshotRepository private constructor(private val context: Context) {
             ?: Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565)
     }
 
+    fun loadComplicationBitmap(): Bitmap {
+        val options = BitmapFactory.Options().apply { inPreferredConfig = Bitmap.Config.RGB_565 }
+        BitmapFactory.decodeFile(combinedMap.absolutePath, options)?.let { return it }
+        val dark = loadCurrentBitmap(MapPalette.DARK)
+        return combineBitmaps(dark, dark).also { dark.recycle() }
+    }
+
     suspend fun refresh(force: Boolean): RefreshResult {
         if (!hasLocationPermission()) return RefreshResult.NO_PERMISSION
         val location = getCurrentLocation() ?: return RefreshResult.NO_LOCATION
         val distance = distanceFromPrevious(location)
-        if (!RefreshPolicy.shouldRender(force, liveMap.exists() && lightMap.exists(), distance, settings.refreshMode)) {
+        if (!RefreshPolicy.shouldRender(
+                force,
+                liveMap.exists() && lightMap.exists() && combinedMap.exists(),
+                distance,
+                settings.refreshMode,
+            )
+        ) {
             return RefreshResult.CACHED
         }
 
@@ -98,8 +112,10 @@ class MapSnapshotRepository private constructor(private val context: Context) {
     private suspend fun renderAndStore(location: Location): RefreshResult = runCatching {
             val darkBitmap = render(location, MapPalette.DARK)
             val lightBitmap = render(location, MapPalette.LIGHT)
+            val combinedBitmap = combineBitmaps(darkBitmap, lightBitmap)
             replaceBitmap(darkBitmap, liveMap)
             replaceBitmap(lightBitmap, lightMap)
+            replaceBitmap(combinedBitmap, combinedMap)
             settings.recordSnapshot(location.latitude, location.longitude, System.currentTimeMillis())
             RefreshResult.UPDATED
         }.getOrElse { error ->
@@ -241,6 +257,14 @@ class MapSnapshotRepository private constructor(private val context: Context) {
             check(bitmap.compress(Bitmap.CompressFormat.JPEG, 92, output))
         }
     }
+
+    private fun combineBitmaps(dark: Bitmap, light: Bitmap): Bitmap =
+        Bitmap.createBitmap(SIZE, SIZE * 2, Bitmap.Config.RGB_565).also { combined ->
+            Canvas(combined).apply {
+                drawBitmap(dark, 0f, 0f, null)
+                drawBitmap(light, 0f, SIZE.toFloat(), null)
+            }
+        }
 
     private fun replaceBitmap(bitmap: Bitmap, target: File) {
         val temporary = File(context.filesDir, "${target.name}.tmp")
