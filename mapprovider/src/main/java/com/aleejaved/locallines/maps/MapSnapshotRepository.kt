@@ -10,11 +10,13 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.location.Location
+import android.util.Log
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -87,7 +89,10 @@ class MapSnapshotRepository private constructor(private val context: Context) {
             }
             settings.recordSnapshot(location.latitude, location.longitude, System.currentTimeMillis())
             RefreshResult.UPDATED
-        }.getOrElse { RefreshResult.FAILED }
+        }.getOrElse { error ->
+            Log.e(TAG, "Unable to render live map", error)
+            RefreshResult.FAILED
+        }
     }
 
     private fun distanceFromPrevious(location: Location): Float {
@@ -116,16 +121,39 @@ class MapSnapshotRepository private constructor(private val context: Context) {
         val client = LocationServices.getFusedLocationProviderClient(context)
         val tokenSource = CancellationTokenSource()
         return runCatching {
-            client.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, tokenSource.token).await()
-                ?: client.lastLocation.await()
-        }.getOrNull()
+            client.lastLocation.await()
+                ?: client.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, tokenSource.token).await()
+        }.getOrElse { error ->
+            Log.w(TAG, "Unable to obtain location", error)
+            null
+        }
     }
 
-    private suspend fun render(location: Location): Bitmap = withContext(Dispatchers.Main) {
+    private suspend fun render(location: Location): Bitmap {
+        val first = renderOnce(location)
+        val firstDensity = lineDensity(first)
+        if (firstDensity >= MIN_LINE_DENSITY) return first
+
+        // A snapshot can occasionally complete before every vector tile arrives on watch Wi-Fi.
+        // Give the tile cache a moment, retry once, and retain whichever render is more complete.
+        delay(TILE_RETRY_DELAY_MS)
+        val second = runCatching { renderOnce(location) }.getOrElse { return first }
+        return if (lineDensity(second) > firstDensity) {
+            first.recycle()
+            second
+        } else {
+            second.recycle()
+            first
+        }
+    }
+
+    private suspend fun renderOnce(location: Location): Bitmap = withContext(Dispatchers.Main) {
         val styleJson = context.resources.openRawResource(R.raw.local_lines_style).bufferedReader().use { it.readText() }
         suspendCancellableCoroutine { continuation ->
             val options = MapSnapshotter.Options(SIZE, SIZE)
                 .withPixelRatio(1f)
+                .withLogo(false)
+                .withAttribution(false)
                 .withStyleBuilder(Style.Builder().fromJson(styleJson))
                 .withCameraPosition(
                     CameraPosition.Builder()
@@ -148,6 +176,19 @@ class MapSnapshotRepository private constructor(private val context: Context) {
         }
     }
 
+    private fun lineDensity(bitmap: Bitmap): Float {
+        var brightSamples = 0
+        var samples = 0
+        for (y in 0 until SIZE - 30 step 3) {
+            for (x in 0 until SIZE step 3) {
+                val color = bitmap.getPixel(x, y)
+                if (Color.red(color) + Color.green(color) + Color.blue(color) > 120) brightSamples++
+                samples++
+            }
+        }
+        return brightSamples.toFloat() / samples
+    }
+
     private fun drawAttribution(bitmap: Bitmap) {
         val canvas = Canvas(bitmap)
         val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -167,6 +208,9 @@ class MapSnapshotRepository private constructor(private val context: Context) {
 
     companion object {
         const val SIZE = 450
+        private const val TAG = "LocalLinesMap"
+        private const val MIN_LINE_DENSITY = 0.015f
+        private const val TILE_RETRY_DELAY_MS = 750L
         @SuppressLint("StaticFieldLeak") // Repository always stores context.applicationContext.
         @Volatile private var instance: MapSnapshotRepository? = null
 

@@ -185,6 +185,7 @@ class SettingsActivity : Activity() {
     private fun actionButton(text: String, action: () -> Unit) = Button(this).apply {
         this.text = text
         isAllCaps = false
+        setTextColor(Color.BLACK)
         setOnClickListener { action() }
     }
 
