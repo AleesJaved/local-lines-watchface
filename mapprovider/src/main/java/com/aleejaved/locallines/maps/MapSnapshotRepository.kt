@@ -10,8 +10,10 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.location.Location
+import android.os.SystemClock
 import android.util.Log
 import androidx.core.content.ContextCompat
+import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
@@ -121,13 +123,33 @@ class MapSnapshotRepository private constructor(private val context: Context) {
         val client = LocationServices.getFusedLocationProviderClient(context)
         val tokenSource = CancellationTokenSource()
         return runCatching {
-            client.lastLocation.await()
-                ?: client.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, tokenSource.token).await()
+            val request = CurrentLocationRequest.Builder()
+                .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
+                .setMaxUpdateAgeMillis(MAX_CURRENT_LOCATION_AGE_MS)
+                .setDurationMillis(LOCATION_REQUEST_TIMEOUT_MS)
+                .build()
+            val current = client.getCurrentLocation(request, tokenSource.token).await()
+            if (current != null) {
+                Log.i(TAG, "Using current location ${current.latitude},${current.longitude} age=${locationAgeMillis(current)}ms")
+                return@runCatching current
+            }
+
+            val cached = client.lastLocation.await()
+            if (cached != null && locationAgeMillis(cached) <= MAX_CACHED_LOCATION_AGE_MS) {
+                Log.i(TAG, "Using recent cached location ${cached.latitude},${cached.longitude} age=${locationAgeMillis(cached)}ms")
+                cached
+            } else {
+                Log.w(TAG, "No current location; cached location is absent or stale")
+                null
+            }
         }.getOrElse { error ->
             Log.w(TAG, "Unable to obtain location", error)
             null
         }
     }
+
+    private fun locationAgeMillis(location: Location): Long =
+        ((SystemClock.elapsedRealtimeNanos() - location.elapsedRealtimeNanos).coerceAtLeast(0L) / 1_000_000L)
 
     private suspend fun render(location: Location): Bitmap {
         val first = renderOnce(location)
@@ -211,6 +233,9 @@ class MapSnapshotRepository private constructor(private val context: Context) {
         private const val TAG = "LocalLinesMap"
         private const val MIN_LINE_DENSITY = 0.015f
         private const val TILE_RETRY_DELAY_MS = 750L
+        private const val MAX_CURRENT_LOCATION_AGE_MS = 60_000L
+        private const val MAX_CACHED_LOCATION_AGE_MS = 15 * 60_000L
+        private const val LOCATION_REQUEST_TIMEOUT_MS = 25_000L
         @SuppressLint("StaticFieldLeak") // Repository always stores context.applicationContext.
         @Volatile private var instance: MapSnapshotRepository? = null
 
