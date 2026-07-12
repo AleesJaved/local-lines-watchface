@@ -131,12 +131,13 @@ class MapSnapshotRepository private constructor(private val context: Context) {
             replaceBitmap(darkBitmap, liveMap)
             replaceBitmap(lightBitmap, lightMap)
             replaceBitmap(combinedBitmap, combinedMap)
-            if (settings.locationLabelMode != LocationLabelMode.NONE) {
+            if (settings.hasEnabledLocationParts()) {
                 locationNameResolver.resolve(location.latitude, location.longitude)?.let { names ->
-                    settings.recordAddress(names.street, names.town, names.city)
+                    settings.recordAddress(names.number, names.road, names.town, names.city, names.country)
                 }
             }
             settings.recordSnapshot(location.latitude, location.longitude, System.currentTimeMillis())
+            GeofenceLocationManager.register(context, location.latitude, location.longitude)
             ComplicationUpdates.requestAll(context)
             RefreshResult.UPDATED
         }.getOrElse { error ->
@@ -273,7 +274,7 @@ class MapSnapshotRepository private constructor(private val context: Context) {
             textSize = 11f
             textAlign = Paint.Align.CENTER
         }
-        canvas.drawText("© OpenStreetMap · © OpenMapTiles", SIZE / 2f, SIZE - 18f, paint)
+        canvas.drawText("© OpenStreetMap · © OpenMapTiles", SIZE / 2f, SIZE - 55f, paint)
     }
 
     private fun writeBitmap(bitmap: Bitmap, target: File) {

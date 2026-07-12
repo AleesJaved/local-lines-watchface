@@ -19,9 +19,9 @@ object PassiveLocationManager {
     @SuppressLint("MissingPermission")
     fun register(context: Context) {
         if (!hasBackgroundLocation(context)) return
-        val request = LocationRequest.Builder(Priority.PRIORITY_PASSIVE, 15 * 60_000L)
-            .setMinUpdateIntervalMillis(5 * 60_000L)
-            .setMinUpdateDistanceMeters(100f)
+        val request = LocationRequest.Builder(Priority.PRIORITY_PASSIVE, 60_000L)
+            .setMinUpdateIntervalMillis(60_000L)
+            .setMinUpdateDistanceMeters(25f)
             .build()
         LocationServices.getFusedLocationProviderClient(context)
             .requestLocationUpdates(request, pendingIntent(context))
@@ -36,7 +36,7 @@ object PassiveLocationManager {
         context,
         REQUEST_CODE,
         Intent(context, PassiveLocationReceiver::class.java),
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
     )
 
     private fun hasBackgroundLocation(context: Context): Boolean =
@@ -47,6 +47,7 @@ object PassiveLocationManager {
 class PassiveLocationReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val location = LocationResult.extractResult(intent)?.lastLocation ?: return
+        RefreshScheduler.enqueueLocationRefresh(context, location)
         RefreshScheduler.enqueuePassiveRefresh(context, location)
     }
 }

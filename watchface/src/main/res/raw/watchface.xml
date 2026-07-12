@@ -127,39 +127,38 @@
         <ComplicationSlot x="0" y="0" width="450" height="450" slotId="3" name="bottom_text" displayName="bottom_text_complication" supportedTypes="LONG_TEXT SHORT_TEXT EMPTY">
             <Variant mode="AMBIENT" target="alpha" value="0" />
             <DefaultProviderPolicy defaultSystemProvider="EMPTY" defaultSystemProviderType="EMPTY" />
-            <BoundingArc centerX="225" centerY="225" width="420" height="420" thickness="42" startAngle="225" endAngle="135" direction="COUNTER_CLOCKWISE" isRoundEdge="TRUE" outlinePadding="3" />
+            <BoundingArc centerX="225" centerY="225" width="420" height="420" thickness="42" startAngle="250" endAngle="110" direction="COUNTER_CLOCKWISE" isRoundEdge="TRUE" outlinePadding="3" />
             <Complication type="LONG_TEXT">
                 <Condition>
                     <Expressions><Expression name="bottom_long_light"><![CDATA[[CONFIGURATION.mapStyle] == "light_multicolor"]]></Expression></Expressions>
-                    <Compare expression="bottom_long_light"><PartText x="0" y="0" width="450" height="450"><TextCircular centerX="225" centerY="225" width="344" height="344" startAngle="225" endAngle="135" direction="COUNTER_CLOCKWISE" align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="22" weight="BLACK" color="#FF202124"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Compare>
-                    <Default><PartText x="0" y="0" width="450" height="450"><TextCircular centerX="225" centerY="225" width="344" height="344" startAngle="225" endAngle="135" direction="COUNTER_CLOCKWISE" align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="22" weight="BLACK" color="[CONFIGURATION.themeColor.2]"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Default>
+                    <Compare expression="bottom_long_light"><PartText x="0" y="0" width="450" height="450"><TextCircular centerX="225" centerY="205" width="410" height="410" startAngle="250" endAngle="110" direction="COUNTER_CLOCKWISE" align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="22" weight="BLACK" color="#FF202124"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Compare>
+                    <Default><PartText x="0" y="0" width="450" height="450"><TextCircular centerX="225" centerY="205" width="410" height="410" startAngle="250" endAngle="110" direction="COUNTER_CLOCKWISE" align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="22" weight="BLACK" color="[CONFIGURATION.themeColor.2]"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Default>
                 </Condition>
             </Complication>
             <Complication type="SHORT_TEXT">
                 <Condition>
                     <Expressions><Expression name="bottom_short_light"><![CDATA[[CONFIGURATION.mapStyle] == "light_multicolor"]]></Expression></Expressions>
-                    <Compare expression="bottom_short_light"><PartText x="0" y="0" width="450" height="450"><TextCircular centerX="225" centerY="225" width="344" height="344" startAngle="225" endAngle="135" direction="COUNTER_CLOCKWISE" align="CENTER"><Font family="SYNC_TO_DEVICE" size="22" weight="BLACK" color="#FF202124"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Compare>
-                    <Default><PartText x="0" y="0" width="450" height="450"><TextCircular centerX="225" centerY="225" width="344" height="344" startAngle="225" endAngle="135" direction="COUNTER_CLOCKWISE" align="CENTER"><Font family="SYNC_TO_DEVICE" size="22" weight="BLACK" color="[CONFIGURATION.themeColor.2]"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Default>
+                    <Compare expression="bottom_short_light"><PartText x="0" y="0" width="450" height="450"><TextCircular centerX="225" centerY="205" width="410" height="410" startAngle="250" endAngle="110" direction="COUNTER_CLOCKWISE" align="CENTER"><Font family="SYNC_TO_DEVICE" size="22" weight="BLACK" color="#FF202124"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Compare>
+                    <Default><PartText x="0" y="0" width="450" height="450"><TextCircular centerX="225" centerY="205" width="410" height="410" startAngle="250" endAngle="110" direction="COUNTER_CLOCKWISE" align="CENTER"><Font family="SYNC_TO_DEVICE" size="22" weight="BLACK" color="[CONFIGURATION.themeColor.2]"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Default>
                 </Condition>
             </Complication>
         </ComplicationSlot>
 
         <ComplicationSlot x="0" y="0" width="450" height="450" slotId="5" name="location" displayName="location_complication" supportedTypes="LONG_TEXT SHORT_TEXT EMPTY">
-            <Variant mode="AMBIENT" target="alpha" value="0" />
             <DefaultProviderPolicy primaryProvider="com.aleejaved.locallines.maps/com.aleejaved.locallines.maps.LocationComplicationService" primaryProviderType="SHORT_TEXT" defaultSystemProvider="EMPTY" defaultSystemProviderType="EMPTY" />
-            <BoundingArc centerX="225" centerY="225" width="420" height="420" thickness="42" startAngle="315" endAngle="45" direction="CLOCKWISE" isRoundEdge="TRUE" outlinePadding="3" />
+            <BoundingArc centerX="225" centerY="225" width="420" height="420" thickness="42" startAngle="290" endAngle="70" direction="CLOCKWISE" isRoundEdge="TRUE" outlinePadding="3" />
             <Complication type="LONG_TEXT">
                 <Condition>
                     <Expressions><Expression name="location_long_light"><![CDATA[[CONFIGURATION.mapStyle] == "light_multicolor"]]></Expression></Expressions>
-                    <Compare expression="location_long_light"><PartText x="0" y="0" width="450" height="450"><TextCircular centerX="225" centerY="225" width="410" height="410" startAngle="315" endAngle="45" direction="CLOCKWISE" align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="22" weight="BLACK" color="#FF202124"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Compare>
-                    <Default><PartText x="0" y="0" width="450" height="450"><TextCircular centerX="225" centerY="225" width="410" height="410" startAngle="315" endAngle="45" direction="CLOCKWISE" align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="22" weight="BLACK" color="[CONFIGURATION.themeColor.2]"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Default>
+                    <Compare expression="location_long_light"><PartText x="0" y="0" width="450" height="450" tintColor="#FF202124"><Variant mode="AMBIENT" target="tintColor" value="#FFF5F0E5" /><TextCircular centerX="225" centerY="245" width="410" height="410" startAngle="290" endAngle="70" direction="CLOCKWISE" align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="22" weight="BLACK"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Compare>
+                    <Default><PartText x="0" y="0" width="450" height="450" tintColor="[CONFIGURATION.themeColor.2]"><Variant mode="AMBIENT" target="tintColor" value="#FFFFFFFF" /><TextCircular centerX="225" centerY="245" width="410" height="410" startAngle="290" endAngle="70" direction="CLOCKWISE" align="CENTER" ellipsis="TRUE"><Font family="SYNC_TO_DEVICE" size="22" weight="BLACK"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Default>
                 </Condition>
             </Complication>
             <Complication type="SHORT_TEXT">
                 <Condition>
                     <Expressions><Expression name="location_short_light"><![CDATA[[CONFIGURATION.mapStyle] == "light_multicolor"]]></Expression></Expressions>
-                    <Compare expression="location_short_light"><PartText x="0" y="0" width="450" height="450"><TextCircular centerX="225" centerY="225" width="410" height="410" startAngle="315" endAngle="45" direction="CLOCKWISE" align="CENTER"><Font family="SYNC_TO_DEVICE" size="22" weight="BLACK" color="#FF202124"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Compare>
-                    <Default><PartText x="0" y="0" width="450" height="450"><TextCircular centerX="225" centerY="225" width="410" height="410" startAngle="315" endAngle="45" direction="CLOCKWISE" align="CENTER"><Font family="SYNC_TO_DEVICE" size="22" weight="BLACK" color="[CONFIGURATION.themeColor.2]"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Default>
+                    <Compare expression="location_short_light"><PartText x="0" y="0" width="450" height="450" tintColor="#FF202124"><Variant mode="AMBIENT" target="tintColor" value="#FFF5F0E5" /><TextCircular centerX="225" centerY="245" width="410" height="410" startAngle="290" endAngle="70" direction="CLOCKWISE" align="CENTER"><Font family="SYNC_TO_DEVICE" size="22" weight="BLACK"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Compare>
+                    <Default><PartText x="0" y="0" width="450" height="450" tintColor="[CONFIGURATION.themeColor.2]"><Variant mode="AMBIENT" target="tintColor" value="#FFFFFFFF" /><TextCircular centerX="225" centerY="245" width="410" height="410" startAngle="290" endAngle="70" direction="CLOCKWISE" align="CENTER"><Font family="SYNC_TO_DEVICE" size="22" weight="BLACK"><Template>%s<Parameter expression="[COMPLICATION.TEXT]" /></Template></Font></TextCircular></PartText></Default>
                 </Condition>
             </Complication>
         </ComplicationSlot>
@@ -181,22 +180,24 @@
                 </DigitalClock>
             </Default>
         </Condition>
-        <PartText x="0" y="112" width="450" height="105" alpha="0">
-            <Variant mode="AMBIENT" target="alpha" value="255" />
-            <Text align="CENTER">
-                <Font family="SYNC_TO_DEVICE" size="100" weight="NORMAL" color="#FF000000">
-                    <Outline color="[CONFIGURATION.themeColor.0]" width="3"><Template>%02d<Parameter expression="[IS_24_HOUR_MODE] ? [HOUR_0_23] : ([HOUR_0_23] % 12 == 0 ? 12 : [HOUR_0_23] % 12)" /></Template></Outline>
-                </Font>
-            </Text>
-        </PartText>
-        <PartText x="0" y="232" width="450" height="105" alpha="0">
-            <Variant mode="AMBIENT" target="alpha" value="255" />
-            <Text align="CENTER">
-                <Font family="SYNC_TO_DEVICE" size="100" weight="NORMAL" color="#FF000000">
-                    <Outline color="[CONFIGURATION.themeColor.0]" width="3"><Template>%02d<Parameter expression="[MINUTE]" /></Template></Outline>
-                </Font>
-            </Text>
-        </PartText>
+        <Condition>
+            <Expressions>
+                <Expression name="aod_dark_multicolor"><![CDATA[[CONFIGURATION.mapStyle] == "multicolor"]]></Expression>
+                <Expression name="aod_light_multicolor"><![CDATA[[CONFIGURATION.mapStyle] == "light_multicolor"]]></Expression>
+            </Expressions>
+            <Compare expression="aod_dark_multicolor">
+                <PartText x="0" y="112" width="450" height="105" alpha="0"><Variant mode="AMBIENT" target="alpha" value="255" /><Text align="CENTER"><Font family="SYNC_TO_DEVICE" size="100" weight="NORMAL" color="#FF000000"><Outline color="#FF62AAFF" width="3"><Template>%02d<Parameter expression="[IS_24_HOUR_MODE] ? [HOUR_0_23] : ([HOUR_0_23] % 12 == 0 ? 12 : [HOUR_0_23] % 12)" /></Template></Outline></Font></Text></PartText>
+                <PartText x="0" y="232" width="450" height="105" alpha="0"><Variant mode="AMBIENT" target="alpha" value="255" /><Text align="CENTER"><Font family="SYNC_TO_DEVICE" size="100" weight="NORMAL" color="#FF000000"><Outline color="#FF62AAFF" width="3"><Template>%02d<Parameter expression="[MINUTE]" /></Template></Outline></Font></Text></PartText>
+            </Compare>
+            <Compare expression="aod_light_multicolor">
+                <PartText x="0" y="112" width="450" height="105" alpha="0"><Variant mode="AMBIENT" target="alpha" value="255" /><Text align="CENTER"><Font family="SYNC_TO_DEVICE" size="100" weight="NORMAL" color="#FF000000"><Outline color="#FFF5F0E5" width="3"><Template>%02d<Parameter expression="[IS_24_HOUR_MODE] ? [HOUR_0_23] : ([HOUR_0_23] % 12 == 0 ? 12 : [HOUR_0_23] % 12)" /></Template></Outline></Font></Text></PartText>
+                <PartText x="0" y="232" width="450" height="105" alpha="0"><Variant mode="AMBIENT" target="alpha" value="255" /><Text align="CENTER"><Font family="SYNC_TO_DEVICE" size="100" weight="NORMAL" color="#FF000000"><Outline color="#FFF5F0E5" width="3"><Template>%02d<Parameter expression="[MINUTE]" /></Template></Outline></Font></Text></PartText>
+            </Compare>
+            <Default>
+                <PartText x="0" y="112" width="450" height="105" alpha="0"><Variant mode="AMBIENT" target="alpha" value="255" /><Text align="CENTER"><Font family="SYNC_TO_DEVICE" size="100" weight="NORMAL" color="#FF000000"><Outline color="[CONFIGURATION.themeColor.0]" width="3"><Template>%02d<Parameter expression="[IS_24_HOUR_MODE] ? [HOUR_0_23] : ([HOUR_0_23] % 12 == 0 ? 12 : [HOUR_0_23] % 12)" /></Template></Outline></Font></Text></PartText>
+                <PartText x="0" y="232" width="450" height="105" alpha="0"><Variant mode="AMBIENT" target="alpha" value="255" /><Text align="CENTER"><Font family="SYNC_TO_DEVICE" size="100" weight="NORMAL" color="#FF000000"><Outline color="[CONFIGURATION.themeColor.0]" width="3"><Template>%02d<Parameter expression="[MINUTE]" /></Template></Outline></Font></Text></PartText>
+            </Default>
+        </Condition>
         <Condition>
             <Expressions>
                 <Expression name="show_location_dot"><![CDATA[[CONFIGURATION.mapStyle] != "tinted"]]></Expression>

@@ -21,11 +21,18 @@ last successful live map and includes a decorative fallback.
 - Residential streets remain visible while driveways, parking aisles, paths, and tracks are omitted.
 - Large stacked digital hour and minute, respecting 12/24-hour settings.
 - Editable weather and step-count complications.
-- Optional curved top location label with street, town, or city detail.
+- Optional curved top location label assembled from any combination of number,
+  road, town, city, and country.
 - Curved bottom text complication for calendars and other long-text sources.
 - Battery Saver, Balanced, and Frequent map refresh modes.
-- Battery-efficient Live mode uses passive movement fixes, a 250 m movement gate,
-  five-minute batching, low-battery/network constraints, and a two-hour fallback.
+- Fast location labels use free passive fused fixes, a best-effort 100 m exit
+  geofence, and active-complication refresh requests rather than a continuous
+  location listener. Map images remain protected
+  by the selected movement gate, 30-second coalescing, low-battery/network
+  constraints, and a periodic fallback.
+- Wear OS does not expose an unprivileged callback for every individual wrist
+  raise. The platform requests the active complication at most every five
+  minutes and reduces requests while ambient or not worn.
 - Black, time-only ambient display.
 - No accounts, analytics, advertisements, API keys, or paid map service.
 

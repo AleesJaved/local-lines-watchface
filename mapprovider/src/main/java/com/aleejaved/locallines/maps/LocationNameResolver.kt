@@ -14,9 +14,11 @@ import java.util.Locale
 import kotlin.coroutines.resume
 
 data class LocationNames(
-    val street: String?,
+    val number: String?,
+    val road: String?,
     val town: String?,
     val city: String?,
+    val country: String?,
 )
 
 class LocationNameResolver(context: Context) {
@@ -66,17 +68,24 @@ class LocationNameResolver(context: Context) {
     private fun Address.toLocationNames(): LocationNames {
         val city = locality.clean() ?: subAdminArea.clean() ?: adminArea.clean()
         val town = subLocality.clean() ?: locality.clean() ?: subAdminArea.clean()
-        val street = thoroughfare.clean() ?: featureName.clean()
-        return LocationNames(street = street, town = town, city = city)
+        val road = thoroughfare.clean() ?: featureName.clean()
+        return LocationNames(
+            number = subThoroughfare.clean(),
+            road = road,
+            town = town,
+            city = city,
+            country = countryName.clean(),
+        )
     }
 
     private fun String?.clean(): String? = this?.trim()?.takeIf { it.isNotEmpty() }
 
-    private fun LocationNames.hasAnyValue(): Boolean = street != null || town != null || city != null
+    private fun LocationNames.hasAnyValue(): Boolean =
+        number != null || road != null || town != null || city != null || country != null
 
     companion object {
-        private const val GEOCODER_TIMEOUT_MS = 10_000L
-        private const val NETWORK_TIMEOUT_MS = 10_000
+        private const val GEOCODER_TIMEOUT_MS = 3_000L
+        private const val NETWORK_TIMEOUT_MS = 6_000
         private const val NOMINATIM_REVERSE_URL = "https://nominatim.openstreetmap.org/reverse"
         private const val USER_AGENT =
             "LocalLinesWatchFace/1.0 (+https://github.com/AleesJaved/local-lines-watchface)"
@@ -87,11 +96,13 @@ class LocationNameResolver(context: Context) {
                 address.optString(key).trim().takeIf { it.isNotEmpty() }
             }
 
-            val street = first("road", "pedestrian", "footway")
+            val number = first("house_number")
+            val road = first("road", "pedestrian", "footway")
             val town = first("town", "village", "suburb", "neighbourhood", "hamlet", "city_district")
             val city = first("city", "town", "municipality", "county", "state_district", "state")
-            return LocationNames(street, town, city).takeIf {
-                it.street != null || it.town != null || it.city != null
+            val country = first("country")
+            return LocationNames(number, road, town, city, country).takeIf {
+                it.number != null || it.road != null || it.town != null || it.city != null || it.country != null
             }
         }
     }

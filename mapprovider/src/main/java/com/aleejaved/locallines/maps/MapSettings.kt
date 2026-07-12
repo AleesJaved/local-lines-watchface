@@ -21,15 +21,48 @@ class MapSettings(context: Context) {
             preferences.edit().putString(KEY_LOCATION_LABEL_MODE, value.name).apply()
         }
 
-    val streetLabel: String? get() = preferences.getString(KEY_STREET_LABEL, null)
+    var locationNumberEnabled: Boolean
+        get() = preferences.getBoolean(KEY_SHOW_NUMBER, locationLabelMode == LocationLabelMode.STREET)
+        set(value) = preferences.edit().putBoolean(KEY_SHOW_NUMBER, value).apply()
+
+    var locationRoadEnabled: Boolean
+        get() = preferences.getBoolean(KEY_SHOW_ROAD, locationLabelMode == LocationLabelMode.STREET)
+        set(value) = preferences.edit().putBoolean(KEY_SHOW_ROAD, value).apply()
+
+    var locationTownEnabled: Boolean
+        get() = preferences.getBoolean(KEY_SHOW_TOWN, locationLabelMode == LocationLabelMode.TOWN)
+        set(value) = preferences.edit().putBoolean(KEY_SHOW_TOWN, value).apply()
+
+    var locationCityEnabled: Boolean
+        get() = preferences.getBoolean(KEY_SHOW_CITY, locationLabelMode == LocationLabelMode.CITY)
+        set(value) = preferences.edit().putBoolean(KEY_SHOW_CITY, value).apply()
+
+    var locationCountryEnabled: Boolean
+        get() = preferences.getBoolean(KEY_SHOW_COUNTRY, false)
+        set(value) = preferences.edit().putBoolean(KEY_SHOW_COUNTRY, value).apply()
+
+    val numberLabel: String? get() = preferences.getString(KEY_NUMBER_LABEL, null)
+    val roadLabel: String? get() = preferences.getString(KEY_STREET_LABEL, null)
     val townLabel: String? get() = preferences.getString(KEY_TOWN_LABEL, null)
     val cityLabel: String? get() = preferences.getString(KEY_CITY_LABEL, null)
+    val countryLabel: String? get() = preferences.getString(KEY_COUNTRY_LABEL, null)
+    val lastLocationLabelUpdatedMillis: Long get() = preferences.getLong(KEY_LABEL_UPDATED, 0L)
 
-    fun selectedLocationLabel(): String? = when (locationLabelMode) {
-        LocationLabelMode.NONE -> null
-        LocationLabelMode.STREET -> streetLabel ?: townLabel ?: cityLabel
-        LocationLabelMode.TOWN -> townLabel ?: cityLabel
-        LocationLabelMode.CITY -> cityLabel ?: townLabel
+    fun hasEnabledLocationParts(): Boolean =
+        locationNumberEnabled || locationRoadEnabled || locationTownEnabled ||
+            locationCityEnabled || locationCountryEnabled
+
+    fun selectedLocationLabel(): String? {
+        val numberAndRoad = listOfNotNull(
+            numberLabel.takeIf { locationNumberEnabled },
+            roadLabel.takeIf { locationRoadEnabled },
+        ).joinToString(" ").takeIf { it.isNotBlank() }
+        return listOfNotNull(
+            numberAndRoad,
+            townLabel.takeIf { locationTownEnabled },
+            cityLabel.takeIf { locationCityEnabled },
+            countryLabel.takeIf { locationCountryEnabled },
+        ).distinct().joinToString(", ").takeIf { it.isNotBlank() }
     }
 
     val lastLatitude: Double?
@@ -53,11 +86,14 @@ class MapSettings(context: Context) {
             .apply()
     }
 
-    fun recordAddress(street: String?, town: String?, city: String?) {
+    fun recordAddress(number: String?, road: String?, town: String?, city: String?, country: String?) {
         preferences.edit()
-            .putString(KEY_STREET_LABEL, street)
+            .putString(KEY_NUMBER_LABEL, number)
+            .putString(KEY_STREET_LABEL, road)
             .putString(KEY_TOWN_LABEL, town)
             .putString(KEY_CITY_LABEL, city)
+            .putString(KEY_COUNTRY_LABEL, country)
+            .putLong(KEY_LABEL_UPDATED, System.currentTimeMillis())
             .apply()
     }
 
@@ -68,8 +104,16 @@ class MapSettings(context: Context) {
         private const val KEY_LONGITUDE = "last_longitude"
         private const val KEY_UPDATED = "last_updated"
         private const val KEY_LOCATION_LABEL_MODE = "location_label_mode"
+        private const val KEY_SHOW_NUMBER = "show_location_number"
+        private const val KEY_SHOW_ROAD = "show_location_road"
+        private const val KEY_SHOW_TOWN = "show_location_town"
+        private const val KEY_SHOW_CITY = "show_location_city"
+        private const val KEY_SHOW_COUNTRY = "show_location_country"
+        private const val KEY_NUMBER_LABEL = "number_label"
         private const val KEY_STREET_LABEL = "street_label"
         private const val KEY_TOWN_LABEL = "town_label"
         private const val KEY_CITY_LABEL = "city_label"
+        private const val KEY_COUNTRY_LABEL = "country_label"
+        private const val KEY_LABEL_UPDATED = "label_updated"
     }
 }

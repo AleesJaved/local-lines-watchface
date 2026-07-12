@@ -11,12 +11,14 @@ class LocationNameResolverTest {
     @Test
     fun parsesStreetTownAndCityFromNominatimAddress() {
         val result = LocationNameResolver.parseNominatim(
-            """{"address":{"road":"High Street","suburb":"Old Town","city":"London"}}""",
+            """{"address":{"house_number":"10","road":"High Street","suburb":"Old Town","city":"London","country":"United Kingdom"}}""",
         )
 
-        assertEquals("High Street", result?.street)
+        assertEquals("10", result?.number)
+        assertEquals("High Street", result?.road)
         assertEquals("Old Town", result?.town)
         assertEquals("London", result?.city)
+        assertEquals("United Kingdom", result?.country)
     }
 
     @Test
@@ -25,7 +27,7 @@ class LocationNameResolverTest {
             """{"address":{"pedestrian":"Market Walk","village":"Oakley","state":"England"}}""",
         )
 
-        assertEquals("Market Walk", result?.street)
+        assertEquals("Market Walk", result?.road)
         assertEquals("Oakley", result?.town)
         assertEquals("England", result?.city)
     }

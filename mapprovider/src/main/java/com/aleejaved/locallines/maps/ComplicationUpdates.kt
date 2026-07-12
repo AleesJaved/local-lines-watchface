@@ -6,14 +6,18 @@ import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUp
 
 object ComplicationUpdates {
     fun requestAll(context: Context) {
-        listOf(
-            MapComplicationService::class.java,
-            LocationComplicationService::class.java,
-        ).forEach { service ->
+        requestMap(context)
+        requestLocation(context)
+    }
+
+    fun requestMap(context: Context) = request(context, MapComplicationService::class.java)
+
+    fun requestLocation(context: Context) = request(context, LocationComplicationService::class.java)
+
+    private fun request(context: Context, service: Class<*>) {
             ComplicationDataSourceUpdateRequester.create(
                 context,
                 ComponentName(context, service),
             ).requestUpdateAll()
-        }
     }
 }

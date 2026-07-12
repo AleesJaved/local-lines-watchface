@@ -15,7 +15,8 @@ class MapSnapshotDeviceTest {
         val context = ApplicationProvider.getApplicationContext<LocalLinesApplication>()
         val repository = MapSnapshotRepository.get(context)
         val settings = MapSettings(context).apply {
-            locationLabelMode = LocationLabelMode.STREET
+            locationNumberEnabled = true
+            locationRoadEnabled = true
         }
 
         val liveResult = repository.refresh(force = true)
