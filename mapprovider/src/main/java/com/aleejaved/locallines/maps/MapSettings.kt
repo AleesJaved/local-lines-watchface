@@ -15,8 +15,8 @@ class MapSettings(context: Context) {
 
     var locationLabelMode: LocationLabelMode
         get() = runCatching {
-            LocationLabelMode.valueOf(preferences.getString(KEY_LOCATION_LABEL_MODE, LocationLabelMode.NONE.name)!!)
-        }.getOrDefault(LocationLabelMode.NONE)
+            LocationLabelMode.valueOf(preferences.getString(KEY_LOCATION_LABEL_MODE, LocationLabelMode.TOWN.name)!!)
+        }.getOrDefault(LocationLabelMode.TOWN)
         set(value) {
             preferences.edit().putString(KEY_LOCATION_LABEL_MODE, value.name).apply()
         }

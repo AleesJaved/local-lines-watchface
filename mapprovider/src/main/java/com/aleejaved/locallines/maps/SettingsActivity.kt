@@ -158,9 +158,6 @@ class SettingsActivity : Activity() {
                 MapSnapshotRepository.RefreshResult.NO_PERMISSION -> getString(R.string.permission_needed)
                 else -> getString(R.string.refresh_failed)
             }
-            if (result == MapSnapshotRepository.RefreshResult.UPDATED) {
-                ComplicationUpdates.requestAll(this@SettingsActivity)
-            }
             updatePreview()
         }
     }

@@ -18,6 +18,7 @@
     <string name="location_town">Town</string>
     <string name="location_city">City</string>
     <string name="location_preview">Current location</string>
+    <string name="location_resolving">Locating…</string>
     <string name="location_complication_label">Local Lines location</string>
     <string name="refreshing">Refreshing map…</string>
     <string name="refresh_success">Map updated</string>

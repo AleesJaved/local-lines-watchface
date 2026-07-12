@@ -19,10 +19,7 @@ class MapRefreshWorker(
             repository.refresh(force = false)
         }
         return when (refreshResult) {
-            MapSnapshotRepository.RefreshResult.UPDATED -> {
-                ComplicationUpdates.requestAll(applicationContext)
-                Result.success()
-            }
+            MapSnapshotRepository.RefreshResult.UPDATED -> Result.success()
             MapSnapshotRepository.RefreshResult.FAILED -> Result.retry()
             else -> Result.success()
         }

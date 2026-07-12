@@ -19,8 +19,12 @@ class LocationComplicationService : SuspendingComplicationDataSourceService() {
         buildData(type, includeTapAction = false)
 
     private fun buildData(type: ComplicationType, includeTapAction: Boolean): ComplicationData {
-        val label = MapSettings(this).selectedLocationLabel()
-            ?: if (includeTapAction) return NoDataComplicationData() else getString(R.string.location_preview)
+        val settings = MapSettings(this)
+        val label = settings.selectedLocationLabel() ?: when {
+            !includeTapAction -> getString(R.string.location_preview)
+            settings.locationLabelMode != LocationLabelMode.NONE -> getString(R.string.location_resolving)
+            else -> return NoDataComplicationData()
+        }
         val text = PlainComplicationText.Builder(label).build()
         val contentDescription = PlainComplicationText.Builder(label).build()
         val tapAction = if (includeTapAction) {

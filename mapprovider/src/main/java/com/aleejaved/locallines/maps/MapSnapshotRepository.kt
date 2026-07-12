@@ -137,6 +137,7 @@ class MapSnapshotRepository private constructor(private val context: Context) {
                 }
             }
             settings.recordSnapshot(location.latitude, location.longitude, System.currentTimeMillis())
+            ComplicationUpdates.requestAll(context)
             RefreshResult.UPDATED
         }.getOrElse { error ->
             Log.e(TAG, "Unable to render live map", error)
