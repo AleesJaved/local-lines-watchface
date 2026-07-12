@@ -180,7 +180,7 @@ class MapSnapshotRepository private constructor(private val context: Context) {
                 .withCameraPosition(
                     CameraPosition.Builder()
                         .target(LatLng(location.latitude, location.longitude))
-                        .zoom(14.2)
+                        .zoom(15.4)
                         .bearing(0.0)
                         .tilt(0.0)
                         .build(),
